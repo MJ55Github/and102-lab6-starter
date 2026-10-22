@@ -7,7 +7,11 @@ plugins {
 
 def apikeyPropertiesFile = rootProject.file("apikey.properties")
 def apikeyProperties = new Properties()
-apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+// apikey.properties is gitignored, so fresh clones fall back to the API_KEY env var
+if (apikeyPropertiesFile.exists()) {
+    apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+}
+def apiKey = apikeyProperties.getProperty('API_KEY', System.getenv('API_KEY') ?: '')
 
 android {
     namespace = "com.codepath.lab6"
@@ -22,7 +26,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "API_KEY", "\"${apikeyProperties['API_KEY']}\"")
+        buildConfigField("String", "API_KEY", "\"${apiKey}\"")
     }
 
     buildTypes {
